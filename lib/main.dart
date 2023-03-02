@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:videoplayer_test/screens/second_screen.dart';
 import './screens/video_player_screen.dart';
 
 void main() {
@@ -16,7 +17,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const VideoPlayerScreen(),
+      initialRoute: "/",
+      routes: {
+        "/": (context) => const VideoPlayerScreen(),
+        SecondPage.routeName: (context) => const SecondPage(),
+      },
     );
   }
 }

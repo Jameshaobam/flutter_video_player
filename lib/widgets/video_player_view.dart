@@ -5,6 +5,7 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:screen_protector/screen_protector.dart';
 import 'package:video_player/video_player.dart';
 
 enum DataSourceType {
@@ -28,9 +29,20 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   late VideoPlayerController _videoPlayerController;
   late ChewieController _chewieController;
 
+  void screenProtectInit() async {
+    log("Init protection");
+    await ScreenProtector.protectDataLeakageOn();
+    await ScreenProtector.protectDataLeakageWithColor(Colors.white);
+  }
+
+  void screenProtectdispose() async {
+    await ScreenProtector.protectDataLeakageOff();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    screenProtectInit();
     super.initState();
 
     switch (widget.dataSourceType) {
@@ -64,9 +76,6 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
       looping: true,
       showControls: true,
 
-      customControls: MaterialControls(
-        showPlayButton: false,
-      )..createElement(),
       materialProgressColors: ChewieProgressColors(playedColor: Colors.red),
       //add additional option menu in the option dot three
       additionalOptions: (context) {
@@ -121,7 +130,9 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         const Divider(),
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: Chewie(controller: _chewieController),
+          child: _chewieController != null
+              ? Chewie(controller: _chewieController)
+              : const Center(child: CircularProgressIndicator()),
         ),
         const SizedBox(
           height: 7.0,
@@ -200,6 +211,8 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   @override
   void dispose() {
     // TODO: implement dispose
+    log("dispose");
+    screenProtectdispose();
     _videoPlayerController.dispose();
     _chewieController.dispose();
     super.dispose();
